@@ -1,45 +1,27 @@
-from sqlmodel import Session
-
-from src.connect.db_connect import Database
 from src.models.place import Place
+from src.services.place_service import PlaceService
 
 class PlaceController:
     def __init__(self):
-        self.db = Database()
+        self.service = PlaceService()
 
-    def create_place(self, name_place: str, country: str, state: str):
-        with self.db.get_session() as session:
-            new_place = Place(name_place=name_place, country=country, state=state)
-            session.add(new_place)
-            session.commit()
-            session.refresh(new_place)
-            return new_place
+    def create_place(self, name_place: str, country: str, state: str) -> Place:
+        return self.service.create_place(name_place=name_place, country=country, state=state)
 
-    def get_place(self, place_id: int):
-        with self.db.get_session() as session:
-            return session.get(Place, place_id)
+    def get_place(self, place_id: int) -> Place:
+        return self.service.get_place(place_id)
     
-    def get_all_places(self):
-        with self.db.get_session() as session:
-            return session.query(Place).all()
+    def get_all(self) -> list[Place]:
+        return self.service.get_all_places()
 
-    def update_place(self, place_id: int, name_place: str, country: str, state: str):
-        with self.db.get_session() as session:
-            place = session.get(Place, place_id)
-            if place:
-                place.name_place = name_place
-                place.country = country
-                place.state = state
-                session.commit()
-                session.refresh(place)
-                return place
-            return None
+    def get_all_places(self) -> list[Place]:
+        return self.service.get_all_places()
+    
+    def get_all_with_pagination(self, page: int, page_size: int) -> list[Place]:
+        return self.service.get_all_with_pagination(page, page_size)
 
-    def delete_place(self, place_id: int):
-        with self.db.get_session() as session:
-            place = session.get(Place, place_id)
-            if place:
-                session.delete(place)
-                session.commit()
-                return True
-            return False
+    def update_place(self, place_id: int, name_place: str, country: str, state: str) -> Place:
+        return self.service.update_place(place_id, name_place=name_place, country=country, state=state)
+
+    def delete_place(self, place_id: int) -> bool:
+        return self.service.delete_place(place_id)

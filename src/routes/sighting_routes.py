@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException
 from src.controllers.sighting_controller import SightingController
 from src.models.sighting import Sighting
 from src.request.sighting_request import SightingRequest
-
+from src.utilities.pagination.paginated_collection import PaginatedCollection
 router = APIRouter()
 sighting_controller = SightingController()
 
@@ -18,7 +18,7 @@ def create_sighting(sighting_request: SightingRequest):
         sighting_request.user_id
     )
 
-@router.get("/{sighting_id}", response_model=Sighting, summary="Get a sighting by ID")
+@router.get("/json/{sighting_id}", response_model=Sighting, summary="Get a sighting by ID")
 def read_sighting(sighting_id: int):
     sighting = sighting_controller.get_sighting(sighting_id)
     if sighting is None:
@@ -44,3 +44,16 @@ def delete_sighting(sighting_id: int):
     if not success:
         raise HTTPException(status_code=404, detail="Sighting not found")
     return {"detail": "Sighting deleted"}
+
+@router.get("/xml/{sighting_id}", summary="Get a sighting by ID in XML format")
+def read_sighting_xml(sighting_id: int):
+    return sighting_controller.get_sighting_xml(sighting_id)
+
+@router.get("/user/{user_id}", response_model=list[Sighting], summary="Get all sightings by user ID")
+def get_sightings_by_user(user_id: int):
+    return sighting_controller.get_sightings_by_user(user_id)
+
+@router.get("/paginated", response_model=list[Sighting], summary="Get paginated sightings")
+def get_paginated_sightings(page: int = 1, page_size: int = 10):
+    paginated_result = sighting_controller.get_paginated_sightings(page, page_size)
+    return paginated_result.items  # Asegúrate de devolver solo los elementos de la colección paginada

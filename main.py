@@ -1,3 +1,4 @@
+import logging
 from fastapi import FastAPI
 
 from src.routes.home_router import router as home_router
@@ -6,6 +7,8 @@ from src.routes.sighting_routes import router as sighting_router
 from src.routes.specie_routes import router as species_router
 from src.routes.taxonomic_category_routes import router as taxonomic_category_router
 
+# config logger
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 app = FastAPI()
 
